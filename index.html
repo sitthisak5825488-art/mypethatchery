@@ -628,10 +628,10 @@ function renderPetImageEl(el, value){
   }
 }
 
-/* เหมือน renderPetImageEl แต่คืนเป็น HTML string ไว้ประกอบในลิสต์คลังไข่ */
+/* คืนเป็น HTML string ไว้ประกอบในลิสต์คลังไข่ */
 function petStageVisualHTML(value){
   return isImagePath(value)
-    ? '<img src="' + value + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;">'
+    ? '<img src="' + value + '" alt="" style="width:100%;height:100%;object-fit:contain;">'
     : value;
 }
 
