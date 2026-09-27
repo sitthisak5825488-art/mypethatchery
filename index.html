@@ -619,10 +619,10 @@ function isImagePath(value){
   return typeof value === "string" && /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(value.trim());
 }
 
-/* โชว์ค่า stage ปัจจุบันลงในกล่องวงกลม petImg — ถ้าเป็นรูปจริงจะขึ้น <img>, ถ้าเป็นอิโมจิจะขึ้นเป็นข้อความ */
+/* โชว์ค่า stage ปัจจุบันลงใน petImg */
 function renderPetImageEl(el, value){
   if (isImagePath(value)){
-    el.innerHTML = '<img src="' + value + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;">';
+    el.innerHTML = '<img src="' + value + '" alt="" style="width:100%;height:100%;object-fit:contain;">';
   } else {
     el.textContent = value;
   }
