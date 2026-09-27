@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adoptable Hatchery — เลี้ยงไข่ ฟักฝัน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF7F0;
+    --lavender:#EDE3FB;
+    --ink:#4A3B5C;
+    --ink-soft:#7C6E90;
+    --pink:#FF9EC7;
+    --mint:#8FE3CF;
+    --sky:#8ECFF7;
+    --sun:#FFD97D;
+    --card-bg: rgba(255,255,255,0.55);
+    --card-border: rgba(255,255,255,0.85);
+    --shadow: 0 20px 50px rgba(122, 95, 160, 0.18);
+    --radius: 28px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    overflow-x:hidden;
+    background:
+      radial-gradient(circle at 15% 20%, #FFE3F0 0%, transparent 45%),
+      radial-gradient(circle at 85% 15%, #DCEBFF 0%, transparent 40%),
+      radial-gradient(circle at 50% 90%, #E4FFF3 0%, transparent 45%),
+      var(--cream);
+    position:relative;
+  }
+  .blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(2px);
+    opacity:0.55;
+    z-index:0;
+    animation: float 12s ease-in-out infinite;
+  }
+  .blob.b1{width:180px;height:180px;background:var(--pink);top:8%;left:6%;animation-delay:0s;}
+  .blob.b2{width:120px;height:120px;background:var(--sky);bottom:10%;left:12%;animation-delay:2s;}
+  .blob.b3{width:150px;height:150px;background:var(--sun);top:12%;right:8%;animation-delay:4s;}
+  .blob.b4{width:100px;height:100px;background:var(--mint);bottom:14%;right:10%;animation-delay:1s;}
+  @keyframes float{
+    0%,100%{ transform: translateY(0) scale(1); }
+    50%{ transform: translateY(-22px) scale(1.05); }
+  }
+
+  h1,h2,h3, .brand{ font-family:'Baloo 2', sans-serif; }
+
+  .app{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:420px;
+  }
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:32px 28px;
+    text-align:center;
+  }
+
+  .brand{
+    font-size:1.5rem;
+    font-weight:800;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .brand span{ color:var(--pink); }
+  .subtitle{
+    margin:0 0 24px;
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    line-height:1.5;
+  }
+
+  /* ---- Redeem screen ---- */
+  .egg-icon{
+    font-size:64px;
+    display:block;
+    margin:0 auto 18px;
+    animation: wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble{
+    0%,100%{ transform: rotate(-4deg); }
+    50%{ transform: rotate(4deg); }
+  }
+
+  input#codeInput{
+    width:100%;
+    padding:14px 16px;
+    font-size:1.05rem;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+    letter-spacing:1px;
+    text-align:center;
+    text-transform:uppercase;
+    border:2px solid rgba(122,95,160,0.25);
+    border-radius:16px;
+    background:rgba(255,255,255,0.7);
+    color:var(--ink);
+    outline:none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  input#codeInput:focus{ border-color:var(--pink); }
+  input#codeInput.shake{ animation: shake 0.4s; border-color:#FF6B6B; }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-8px); }
+    75%{ transform: translateX(8px); }
+  }
+
+  .btn{
+    display:inline-block;
+    width:100%;
+    padding:14px 18px;
+    margin-top:14px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    border:none;
+    border-radius:16px;
+    cursor:pointer;
+    color:#fff;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+  }
+  .btn:active{ transform: scale(0.96); }
+  .btn:hover{ filter:brightness(1.05); }
+  .btn-primary{ background: linear-gradient(135deg, var(--pink), #FF7FB0); box-shadow: 0 8px 20px rgba(255,126,176,0.4); }
+  .btn-mint{ background: linear-gradient(135deg, var(--mint), #5FD1B8); box-shadow: 0 8px 20px rgba(95,209,184,0.4); }
+  .btn-sky{ background: linear-gradient(135deg, var(--sky), #63B4E8); box-shadow: 0 8px 20px rgba(99,180,232,0.4); }
+  .btn-sun{ background: linear-gradient(135deg, var(--sun), #F5B942); box-shadow: 0 10px 24px rgba(245,185,66,0.45); color:var(--ink); }
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    box-shadow:none;
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:0.85rem;
+    text-decoration:underline;
+    padding:8px;
+  }
+  .row{ display:flex; gap:10px; }
+  .row .btn{ margin-top:14px; }
+
+  .msg{
+    margin-top:12px;
+    font-size:0.9rem;
+    font-weight:700;
+    min-height:20px;
+  }
+  .msg.error{ color:#E0577A; }
+  .msg.success{ color:#3FAE8C; }
+
+  /* ---- Pet screen ---- */
+  .badge{
+    display:inline-block;
+    padding:6px 16px;
+    border-radius:999px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:0.8rem;
+    color:#fff;
+    margin-bottom:14px;
+  }
+  .badge.stage0{ background: linear-gradient(135deg,#B9A6E0,#9C82D6); }
+  .badge.stage1{ background: linear-gradient(135deg,var(--sun),#F0A93C); color:var(--ink); }
+  .badge.stage2{ background: linear-gradient(135deg,var(--mint),#42C7A6); }
+
+  .pet-name{ font-size:1.25rem; font-weight:700; margin:0 0 14px; }
+
+  .rarity-tag{
+    display:inline-block;
+    font-size:0.72rem;
+    font-weight:700;
+    color:#B8860B;
+    background:rgba(255,217,125,0.4);
+    padding:3px 12px;
+    border-radius:999px;
+    margin-bottom:8px;
+  }
+  .rarity-tag.variant-tag{
+    display:inline-block;
+    margin-left:6px;
+    color:#fff;
+    background: linear-gradient(135deg, #C77DFF, #FF9EC7);
+    box-shadow: 0 4px 14px rgba(199,125,255,0.45);
+    animation: sparkle-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes sparkle-pulse{
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.06); }
+  }
+
+  .pet-stage-img{
+    width:190px;
+    height:190px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #F1E9FF 70%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:96px;
+    box-shadow: inset 0 0 0 6px rgba(255,255,255,0.6), 0 12px 30px rgba(122,95,160,0.25);
+    user-select:none;
+  }
+  .pet-stage-img.bounce{ animation: bounce 0.5s ease; }
+  @keyframes bounce{
+    0%{ transform: scale(1); }
+    30%{ transform: scale(1.15) rotate(-4deg); }
+    60%{ transform: scale(0.95) rotate(3deg); }
+    100%{ transform: scale(1); }
+  }
+  .pet-stage-img.shake-crack{ animation: crack 0.5s ease; }
+  @keyframes crack{
+    0%,100%{ transform: translateX(0) rotate(0); }
+    20%{ transform: translateX(-4px) rotate(-3deg); }
+    40%{ transform: translateX(4px) rotate(3deg); }
+    60%{ transform: translateX(-3px) rotate(-2deg); }
+    80%{ transform: translateX(3px) rotate(2deg); }
+  }
+
+  .stats{ text-align:left; margin-bottom:8px; }
+  .stat-row{ margin-bottom:12px; }
+  .stat-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.82rem;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin-bottom:4px;
+  }
+  .bar-track{
+    width:100%;
+    height:12px;
+    border-radius:999px;
+    background:rgba(122,95,160,0.12);
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:999px;
+    transition: width 0.5s ease;
+  }
+  .bar-fill.hunger{ background: linear-gradient(90deg, var(--sun), #F5B942); }
+  .bar-fill.happy{ background: linear-gradient(90deg, var(--pink), #FF7FB0); }
+  .bar-fill.exp{ background: linear-gradient(90deg, var(--sky), var(--mint)); }
+
+  .download-box{
+    margin-top:18px;
+    padding:16px;
+    border-radius:18px;
+    background: linear-gradient(135deg, rgba(255,217,125,0.35), rgba(143,227,207,0.35));
+    border:1px dashed rgba(122,95,160,0.35);
+  }
+  .download-box p{ margin:0 0 10px; font-size:0.85rem; color:var(--ink-soft); font-weight:700; }
+
+  .footer-links{
+    margin-top:18px;
+    display:flex;
+    justify-content:center;
+    gap:18px;
+  }
+
+  .hint{
+    margin-top:16px;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    line-height:1.5;
+  }
+
+  .btn:disabled{
+    opacity:0.55;
+    cursor:not-allowed;
+    filter:none;
+    transform:none;
+  }
+  .btn:disabled:active{ transform:none; }
+
+  .top-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:6px;
+  }
+  .inv-btn{
+    padding:6px 12px;
+    font-size:0.76rem;
+    border-radius:999px;
+    background:rgba(122,95,160,0.1);
+    text-decoration:none;
+  }
+
+  /* ---- Inventory modal ---- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(74,59,92,0.35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10;
+    padding:20px;
+  }
+  .modal-card{
+    background:#FFFDFB;
+    border-radius:24px;
+    padding:24px;
+    width:100%;
+    max-width:380px;
+    max-height:80vh;
+    overflow-y:auto;
+    box-shadow:var(--shadow);
+    text-align:left;
+  }
+  .modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .modal-header h3{ margin:0; font-size:1.1rem; }
+  .modal-close{
+    background:none;
+    border:none;
+    font-size:1.1rem;
+    cursor:pointer;
+    color:var(--ink-soft);
+    line-height:1;
+  }
+  .inv-item{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    border-radius:16px;
+    margin-bottom:8px;
+    background:rgba(122,95,160,0.06);
+    cursor:pointer;
+    text-align:left;
+    border:2px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+    font-family:'Nunito', sans-serif;
+  }
+  .inv-item:hover{ background:rgba(122,95,160,0.12); }
+  .inv-item.active-egg{ border-color:var(--pink); background:rgba(255,158,199,0.15); }
+  .inv-item .inv-emoji{ font-size:32px; flex-shrink:0; width:36px; height:36px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .inv-item .inv-info{ flex:1; }
+  .inv-item .inv-name{ font-weight:700; font-size:0.9rem; color:var(--ink); }
+  .inv-item .inv-stage{ font-size:0.75rem; color:var(--ink-soft); }
+  .inv-empty{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    text-align:center;
+    padding:20px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="blob b3"></div>
+<div class="blob b4"></div>
+
+<div class="app">
+
+  <!-- Redeem Screen -->
+  <div class="card" id="redeemScreen">
+    <span class="egg-icon">🥚</span>
+    <h1 class="brand">Adoptable <span>Hatchery</span></h1>
+    <p class="subtitle">กรอกรหัส Redeem Code จากไข่ที่คุณประมูลได้ เพื่อเริ่มเลี้ยงจนฟักเป็นร่างโตเต็มวัย</p>
+    <input type="text" id="codeInput" placeholder="EGG-XXXX-0000" maxlength="20" autocomplete="off">
+    <button class="btn btn-primary" id="redeemBtn">✨ ยืนยันรหัส</button>
+    <p class="msg" id="redeemMsg"></p>
+    <button class="btn-ghost" id="backToPetBtn" style="display:none;">← กลับไปที่ไข่ที่กำลังเลี้ยงอยู่</button>
+    <p class="hint">ทำไข่หายหรือปิดเบราว์เซอร์ไปแล้ว? แค่กรอกรหัสเดิมอีกครั้ง ระบบจะโหลดความคืบหน้าที่เคยเลี้ยงไว้ให้อัตโนมัติ</p>
+  </div>
+
+  <!-- Pet Screen -->
+  <div class="card" id="petScreen" style="display:none;">
+    <div class="top-bar">
+      <span class="badge" id="stageBadge">Stage</span>
+      <button class="btn-ghost inv-btn" id="inventoryBtn">📦 คลังไข่ (0)</button>
+    </div>
+    <span class="rarity-tag" id="rarityTag" style="display:none;"></span>
+    <span class="rarity-tag variant-tag" id="variantTag" style="display:none;"></span>
+    <h2 class="pet-name" id="petName">ชื่อสัตว์เลี้ยง</h2>
+
+    <div class="pet-stage-img" id="petImg">🥚</div>
+
+    <div class="stats">
+      <div class="stat-row">
+        <div class="stat-label"><span>🍖 ความหิว</span><span id="hungerVal">0/100</span></div>
+        <div class="bar-track"><div class="bar-fill hunger" id="hungerBar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"><span>❤️ ความสุข</span><span id="happyVal">0/100</span></div>
+        <div class="bar-track"><div class="bar-fill happy" id="happyBar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-label"><span>✨ การเติบโต</span><span id="expVal">0/100</span></div>
+        <div class="bar-track"><div class="bar-fill exp" id="expBar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn btn-sun" id="feedBtn">🍖 ให้อาหาร</button>
+      <button class="btn btn-mint" id="petBtn">💗 ลูบหัว</button>
+    </div>
+
+    <div class="download-box" id="downloadBox" style="display:none;">
+      <p>🎉 ฟักครบสมบูรณ์แล้ว! รับภาพความละเอียดสูงได้เลย</p>
+      <button class="btn btn-sky" id="downloadBtn">🎨 ดาวน์โหลดรูปภาพ HD (Full Art)</button>
+    </div>
+
+    <div class="footer-links">
+      <button class="btn-ghost" id="resetBtn">🗑️ ล้างข้อมูลไข่นี้</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Inventory Modal -->
+<div class="modal-overlay" id="inventoryModal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3>📦 คลังไข่ของฉัน</h3>
+      <button class="modal-close" id="closeInventoryBtn">✕</button>
+    </div>
+    <div id="inventoryList"></div>
+    <button class="btn btn-primary" id="addEggBtn">✨ เพิ่มไข่ฟองใหม่</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   PET_DATABASE — เพิ่มไข่ฟองใหม่ได้ที่นี่ ไม่ต้องแก้โค้ดส่วนอื่น
+   stages: [ไข่, ไข่ร้าว, ตัวเต็มวัย] — ใส่ได้ 2 แบบ ระบบตรวจจับให้อัตโนมัติ
+     1) อิโมจิ/ข้อความ เช่น "🥚" (ใช้ตอนยังไม่มีภาพจริง โชว์ได้ทันที)
+     2) พาธ/ลิงก์รูปภาพจริง เช่น "images/fire_stage1.png" หรือ URL เต็ม
+        (ถ้าใช้รูปจริง ให้ตั้งชื่อไฟล์ลงท้ายด้วย .png .jpg .jpeg .webp .gif หรือ .svg
+        ระบบจะรู้เองว่าต้องโชว์เป็น <img> ไม่ใช่ข้อความ)
+
+   ปรับความยาก/ความแรร์ของแต่ละไข่ได้เป็นรายตัว โดยใส่ฟิลด์เหล่านี้เพิ่ม
+   (ถ้าไม่ใส่ ระบบจะใช้ค่ากลาง DEFAULT_* ด้านล่างแทนอัตโนมัติ):
+     rarity            : ข้อความแสดงระดับความแรร์ เช่น "Legendary" (แค่โชว์ผล ไม่กระทบเกม)
+     feedHungerGain    : ให้อาหาร 1 ครั้ง ความหิวขึ้นกี่แต้ม (ยิ่งน้อย = อิ่มยาก)
+     feedExpGain       : ให้อาหาร 1 ครั้ง Exp ขึ้นกี่แต้ม
+     petHappyGain      : ลูบหัว 1 ครั้ง ความสุขขึ้นกี่แต้ม (ยิ่งน้อย = ปลื้มยาก)
+     petExpGain        : ลูบหัว 1 ครั้ง Exp ขึ้นกี่แต้ม
+     feedCooldownHours : ให้อาหารได้อีกครั้งต้องรอกี่ชั่วโมง
+     petCooldownHours  : ลูบหัวได้อีกครั้งต้องรอกี่ชั่วโมง
+
+   variants: ระบบสุ่มสีพิเศษตอนไถ่ไข่ (สุ่มแค่ครั้งเดียวตอนสร้างเซฟใหม่ แล้วล็อกผลถาวร
+   ไม่สุ่มซ้ำตอนรีเฟรชหรือรีเซ็ตค่าเลี้ยง) ใส่เป็น array ของ { key, weight, label, stages, downloadUrl }
+     key           : รหัสระบุตัวแปร ไม่ซ้ำกันในไข่ฟองเดียวกัน (จำเป็น)
+     weight        : น้ำหนักโอกาสสุ่ม เทียบเป็นสัดส่วนกับตัวอื่นในลิสต์ (จำเป็น) เช่น normal:98, shiny:2 = โอกาส shiny 2%
+     label         : ข้อความแท็กพิเศษที่จะโชว์บนหน้าเลี้ยง ถ้าไม่ใส่ (เช่นตัว normal) จะไม่มีแท็กขึ้น
+     stages   : ถ้าไม่ใส่ จะ fallback ไปใช้ stages ของไข่หลักแทน (ไม่ต้องพิมพ์ซ้ำสำหรับตัว normal)
+     downloadUrl   : ถ้าไม่ใส่ จะ fallback ไปใช้ downloadUrl ของไข่หลักแทน
+   ถ้าไม่ใส่ฟิลด์ variants เลย = ไข่ฟองนั้นไม่มีระบบสุ่มสี ใช้ stages/downloadUrl ปกติเสมอ
+========================================================= */
+const PET_DATABASE = {
+  "EGG-FIRE-9X2A": {
+    name: "ไข่มังกรเพลิง (Fire Dragon)",
+    stages: ["🥚", "🔥🥚", "🐉"],
+    downloadUrl: "https://drive.google.com/uc?id=YOUR_FILE_ID_1",
+    rarity: "ปกติ",
+    // ตัวอย่าง: โอกาส 2% ได้สีพิเศษ (Shiny) ที่มีภาพ/ลิงก์ HD แยกต่างหาก
+    variants: [
+      { key: "normal", weight: 98 },
+      {
+        key: "shiny",
+        weight: 2,
+        label: "✨ สีพิเศษ (Shiny) — เจอโอกาสแค่ 2%!",
+        stages: ["🥚", "💠🥚", "🐲"],
+        downloadUrl: "https://drive.google.com/uc?id=YOUR_SHINY_FILE_ID"
+      }
+    ]
+    // ไม่ใส่ฟิลด์ gain/cooldown ไว้ = ใช้ค่ากลางทั้งหมด
+  },
+  "EGG-WTR-87BP": {
+    name: "ไข่พญานาคาสมุทร (Ocean Serpent)",
+    stages: ["🥚", "💧🥚", "🐍"],
+    downloadUrl: "https://drive.google.com/uc?id=YOUR_FILE_ID_2",
+    rarity: "ปกติ"
+  },
+  "EGG-GOLD-RARE1": {
+    name: "ไข่เทพมังกรทองคำ (Golden Sovereign — หายากมาก)",
+    stages: ["🥚", "✨🥚", "🐲"],
+    downloadUrl: "https://drive.google.com/uc?id=YOUR_FILE_ID_3",
+    rarity: "Legendary",
+    // ตัวอย่าง: ไข่แรร์ เลี้ยงยากกว่าไข่ปกติชัดเจน — อิ่ม/ปลื้มขึ้นน้อยกว่า และต้องรอนานกว่าจะทำซ้ำได้
+    feedHungerGain: 12,
+    feedExpGain: 4,
+    petHappyGain: 10,
+    petExpGain: 3,
+    feedCooldownHours: 8,
+    petCooldownHours: 8
+  }
+};
+
+/* ---- ค่ากลาง ใช้กับไข่ที่ไม่ได้ระบุ override รายตัว ---- */
+const DEFAULT_FEED_HUNGER_GAIN = 22;
+const DEFAULT_FEED_EXP_GAIN = 8;
+const DEFAULT_PET_HAPPY_GAIN = 18;
+const DEFAULT_PET_EXP_GAIN = 6;
+const DEFAULT_FEED_COOLDOWN_HOURS = 4;
+const DEFAULT_PET_COOLDOWN_HOURS = 4;
+
+/* รวมค่า override รายตัวของไข่ code นี้ เข้ากับค่ากลาง */
+function getPetConfig(code){
+  const pet = PET_DATABASE[code] || {};
+  return {
+    feedHungerGain: pet.feedHungerGain ?? DEFAULT_FEED_HUNGER_GAIN,
+    feedExpGain: pet.feedExpGain ?? DEFAULT_FEED_EXP_GAIN,
+    petHappyGain: pet.petHappyGain ?? DEFAULT_PET_HAPPY_GAIN,
+    petExpGain: pet.petExpGain ?? DEFAULT_PET_EXP_GAIN,
+    feedCooldownMs: (pet.feedCooldownHours ?? DEFAULT_FEED_COOLDOWN_HOURS) * 60 * 60 * 1000,
+    petCooldownMs: (pet.petCooldownHours ?? DEFAULT_PET_COOLDOWN_HOURS) * 60 * 60 * 1000
+  };
+}
+
+/* ---- Tunable game constants ---- */
+const DECAY_HUNGER_PER_HOUR = 6;     // ความหิวลดลงกี่แต้มต่อชั่วโมงที่ไม่ได้เข้าเว็บ
+const DECAY_HAPPY_PER_HOUR = 4;      // ความสุขลดลงกี่แต้มต่อชั่วโมง
+const LIVE_DECAY_TICK_MS = 30 * 1000; // ระหว่างเปิดหน้าค้างไว้ ให้คำนวณค่าลดใหม่ทุกกี่มิลลิวินาที
+const STORAGE_ACTIVE_KEY = "adoptable_active_code";
+const STORAGE_SAVE_PREFIX = "adoptable_save_";
+const STORAGE_OWNED_KEY = "adoptable_owned_codes";
+
+let currentCode = null;
+let currentSave = null;
+
+const $ = (id) => document.getElementById(id);
+
+function normalizeCode(raw){
+  return (raw || "").trim().toUpperCase();
+}
+
+function getSave(code){
+  const raw = localStorage.getItem(STORAGE_SAVE_PREFIX + code);
+  return raw ? ensureSaveShape(JSON.parse(raw)) : null;
+}
+
+function writeSave(code, save){
+  localStorage.setItem(STORAGE_SAVE_PREFIX + code, JSON.stringify(save));
+}
+
+function createNewSave(){
+  return { hunger: 60, happiness: 60, exp: 0, lastUpdate: Date.now(), lastFeedAt: 0, lastPetAt: 0, variantKey: null };
+}
+
+/* เติมฟิลด์ให้เซฟเก่า (ก่อนมีระบบ cooldown/variant) ไม่ให้พัง */
+function ensureSaveShape(save){
+  if (typeof save.lastFeedAt !== "number") save.lastFeedAt = 0;
+  if (typeof save.lastPetAt !== "number") save.lastPetAt = 0;
+  if (typeof save.variantKey === "undefined") save.variantKey = null;
+  return save;
+}
+
+/* ---- ระบบสุ่มสีพิเศษ (variants) ---- */
+function rollVariant(variants){
+  const totalWeight = variants.reduce((sum, v) => sum + (v.weight || 1), 0);
+  let roll = Math.random() * totalWeight;
+  for (const v of variants){
+    roll -= (v.weight || 1);
+    if (roll <= 0) return v;
+  }
+  return variants[variants.length - 1];
+}
+
+/* สุ่ม variant ให้เซฟที่ยังไม่เคยสุ่ม (ไข่ใหม่ หรือเซฟเก่าก่อนเพิ่มฟีเจอร์นี้) แล้วล็อกผลถาวรลงในเซฟ */
+function ensureVariant(code, save){
+  const pet = PET_DATABASE[code];
+  if (pet && Array.isArray(pet.variants) && pet.variants.length > 0 && !save.variantKey){
+    save.variantKey = rollVariant(pet.variants).key;
+    writeSave(code, save);
+  }
+  return save;
+}
+
+/* รวมภาพ/ลิงก์ดาวน์โหลด/แท็กพิเศษ ของไข่ code นี้ตาม variant ที่เซฟนั้นสุ่มได้ */
+function getPetVisual(code, save){
+  const pet = PET_DATABASE[code];
+  if (pet.variants && pet.variants.length > 0){
+    const variant = pet.variants.find((v) => v.key === save.variantKey) || pet.variants[0];
+    return {
+      stages: variant.stages || pet.stages,
+      downloadUrl: variant.downloadUrl || pet.downloadUrl,
+      variantLabel: variant.label || null
+    };
+  }
+  return { stages: pet.stages, downloadUrl: pet.downloadUrl, variantLabel: null };
+}
+
+/* ตรวจว่าค่าที่ใส่ใน stages เป็นพาธ/ลิงก์รูปภาพ หรือเป็นอิโมจิ/ข้อความธรรมดา */
+function isImagePath(value){
+  return typeof value === "string" && /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(value.trim());
+}
+
+/* โชว์ค่า stage ปัจจุบันลงในกล่องวงกลม petImg — ถ้าเป็นรูปจริงจะขึ้น <img>, ถ้าเป็นอิโมจิจะขึ้นเป็นข้อความ */
+function renderPetImageEl(el, value){
+  if (isImagePath(value)){
+    el.innerHTML = '<img src="' + value + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;">';
+  } else {
+    el.textContent = value;
+  }
+}
+
+/* เหมือน renderPetImageEl แต่คืนเป็น HTML string ไว้ประกอบในลิสต์คลังไข่ */
+function petStageVisualHTML(value){
+  return isImagePath(value)
+    ? '<img src="' + value + '" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;">'
+    : value;
+}
+
+/* ---- Inventory (คลังไข่) ---- */
+function getOwnedCodes(){
+  const raw = localStorage.getItem(STORAGE_OWNED_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+function addOwnedCode(code){
+  const owned = getOwnedCodes();
+  if (!owned.includes(code)){
+    owned.push(code);
+    localStorage.setItem(STORAGE_OWNED_KEY, JSON.stringify(owned));
+  }
+}
+
+/* สำหรับผู้ที่เคยเลี้ยงไข่มาก่อนจะมีระบบคลัง: กวาดหาเซฟเก่าในเบราว์เซอร์มาขึ้นคลังให้อัตโนมัติ */
+function migrateOwnedCodes(){
+  const owned = new Set(getOwnedCodes());
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith(STORAGE_SAVE_PREFIX)){
+      owned.add(key.slice(STORAGE_SAVE_PREFIX.length));
+    }
+  });
+  localStorage.setItem(STORAGE_OWNED_KEY, JSON.stringify([...owned]));
+}
+
+function getStage(exp){
+  if (exp >= 100) return 2;
+  if (exp >= 40) return 1;
+  return 0;
+}
+
+function stageLabel(stage){
+  return stage === 0 ? "Stage 0 · ไข่" : stage === 1 ? "Stage 1 · ไข่ร้าว" : "Stage 2 · โตเต็มวัย";
+}
+
+/* Apply real-time decay based on elapsed time since lastUpdate */
+function applyDecay(save){
+  const now = Date.now();
+  const hoursElapsed = (now - save.lastUpdate) / (1000 * 60 * 60);
+  if (hoursElapsed > 0){
+    save.hunger = clamp(save.hunger - hoursElapsed * DECAY_HUNGER_PER_HOUR, 0, 100);
+    save.happiness = clamp(save.happiness - hoursElapsed * DECAY_HAPPY_PER_HOUR, 0, 100);
+  }
+  save.lastUpdate = now;
+  return save;
+}
+
+function clamp(v, min, max){
+  return Math.max(min, Math.min(max, v));
+}
+
+/* ---- Screens ---- */
+function showRedeemScreen(){
+  $("petScreen").style.display = "none";
+  $("redeemScreen").style.display = "block";
+  $("codeInput").value = "";
+  $("redeemMsg").textContent = "";
+  $("redeemMsg").className = "msg";
+  $("backToPetBtn").style.display = currentCode ? "inline-block" : "none";
+  $("codeInput").focus();
+}
+
+function showPetScreen(){
+  $("redeemScreen").style.display = "none";
+  $("petScreen").style.display = "block";
+  renderPetScreen();
+}
+
+function renderPetScreen(){
+  const pet = PET_DATABASE[currentCode];
+  const save = currentSave;
+  const stage = getStage(save.exp);
+  const visual = getPetVisual(currentCode, save);
+
+  $("petName").textContent = pet.name;
+  const badge = $("stageBadge");
+  badge.textContent = stageLabel(stage);
+  badge.className = "badge stage" + stage;
+
+  renderPetImageEl($("petImg"), visual.stages[stage]);
+
+  const rarityTag = $("rarityTag");
+  if (pet.rarity){
+    rarityTag.textContent = "🌟 " + pet.rarity;
+    rarityTag.style.display = "inline-block";
+  } else {
+    rarityTag.style.display = "none";
+  }
+
+  const variantTag = $("variantTag");
+  if (visual.variantLabel){
+    variantTag.textContent = visual.variantLabel;
+    variantTag.style.display = "inline-block";
+  } else {
+    variantTag.style.display = "none";
+  }
+
+  $("hungerVal").textContent = Math.round(save.hunger) + "/100";
+  $("happyVal").textContent = Math.round(save.happiness) + "/100";
+  $("expVal").textContent = Math.round(Math.min(save.exp,100)) + "/100";
+  $("hungerBar").style.width = save.hunger + "%";
+  $("happyBar").style.width = save.happiness + "%";
+  $("expBar").style.width = Math.min(save.exp,100) + "%";
+
+  $("downloadBox").style.display = stage === 2 ? "block" : "none";
+
+  updateActionButtons();
+  updateInventoryBadgeCount();
+}
+
+/* ---- Cooldown helpers ---- */
+function cooldownRemaining(timestamp, cooldownMs){
+  return Math.max(0, (timestamp || 0) + cooldownMs - Date.now());
+}
+
+function formatDuration(ms){
+  const totalSec = Math.ceil(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return [h, m, s].map((n) => String(n).padStart(2, "0")).join(":");
+}
+
+function updateActionButtons(){
+  if (!currentSave || !currentCode) return;
+  const cfg = getPetConfig(currentCode);
+  const feedBtn = $("feedBtn");
+  const petBtn = $("petBtn");
+
+  const feedRemain = cooldownRemaining(currentSave.lastFeedAt, cfg.feedCooldownMs);
+  if (feedRemain > 0){
+    feedBtn.disabled = true;
+    feedBtn.textContent = "⏳ รออีก " + formatDuration(feedRemain);
+  } else {
+    feedBtn.disabled = false;
+    feedBtn.textContent = "🍖 ให้อาหาร";
+  }
+
+  const petRemain = cooldownRemaining(currentSave.lastPetAt, cfg.petCooldownMs);
+  if (petRemain > 0){
+    petBtn.disabled = true;
+    petBtn.textContent = "⏳ รออีก " + formatDuration(petRemain);
+  } else {
+    petBtn.disabled = false;
+    petBtn.textContent = "💗 ลูบหัว";
+  }
+}
+
+function updateInventoryBadgeCount(){
+  const owned = getOwnedCodes().filter((code) => PET_DATABASE[code]);
+  $("inventoryBtn").textContent = "📦 คลังไข่ (" + owned.length + ")";
+}
+
+function persist(){
+  writeSave(currentCode, currentSave);
+}
+
+/* ---- Actions ---- */
+function doFeed(){
+  const cfg = getPetConfig(currentCode);
+  if (cooldownRemaining(currentSave.lastFeedAt, cfg.feedCooldownMs) > 0) return;
+  currentSave.hunger = clamp(currentSave.hunger + cfg.feedHungerGain, 0, 100);
+  currentSave.exp = clamp(currentSave.exp + cfg.feedExpGain, 0, 100);
+  currentSave.lastFeedAt = Date.now();
+  currentSave.lastUpdate = Date.now();
+  persist();
+  renderPetScreen();
+  playAnim("bounce");
+}
+
+function doPet(){
+  const cfg = getPetConfig(currentCode);
+  if (cooldownRemaining(currentSave.lastPetAt, cfg.petCooldownMs) > 0) return;
+  currentSave.happiness = clamp(currentSave.happiness + cfg.petHappyGain, 0, 100);
+  currentSave.exp = clamp(currentSave.exp + cfg.petExpGain, 0, 100);
+  currentSave.lastPetAt = Date.now();
+  currentSave.lastUpdate = Date.now();
+  persist();
+  renderPetScreen();
+  playAnim("shake-crack");
+}
+
+function playAnim(cls){
+  const img = $("petImg");
+  img.classList.remove("bounce","shake-crack");
+  void img.offsetWidth; // reflow to restart animation
+  img.classList.add(cls);
+}
+
+/* ---- Redeem flow ---- */
+function tryRedeem(){
+  const code = normalizeCode($("codeInput").value);
+  const msg = $("redeemMsg");
+
+  if (!code){
+    showRedeemError("กรุณากรอกรหัส Redeem Code ก่อนนะ");
+    return;
+  }
+  const pet = PET_DATABASE[code];
+  if (!pet){
+    showRedeemError("ไม่พบรหัสนี้ในระบบ ลองตรวจสอบตัวพิมพ์อีกครั้ง");
+    return;
+  }
+
+  let save = getSave(code);
+  if (!save){
+    save = createNewSave();
+    writeSave(code, save);
+  } else {
+    save = applyDecay(save);
+    writeSave(code, save);
+  }
+  save = ensureVariant(code, save);
+  addOwnedCode(code);
+
+  currentCode = code;
+  currentSave = save;
+  localStorage.setItem(STORAGE_ACTIVE_KEY, code);
+
+  msg.textContent = "ยืนยันสำเร็จ! กำลังฟักไข่ของคุณ...";
+  msg.className = "msg success";
+  setTimeout(showPetScreen, 400);
+}
+
+function showRedeemError(text){
+  $("redeemMsg").textContent = text;
+  $("redeemMsg").className = "msg error";
+  const input = $("codeInput");
+  input.classList.remove("shake");
+  void input.offsetWidth;
+  input.classList.add("shake");
+}
+
+/* ---- Inventory modal ---- */
+function openInventory(){
+  renderInventoryList();
+  $("inventoryModal").style.display = "flex";
+}
+
+function closeInventory(){
+  $("inventoryModal").style.display = "none";
+}
+
+function renderInventoryList(){
+  const owned = getOwnedCodes().filter((code) => PET_DATABASE[code]);
+  const list = $("inventoryList");
+  list.innerHTML = "";
+
+  if (owned.length === 0){
+    list.innerHTML = '<p class="inv-empty">ยังไม่มีไข่ในคลัง กดปุ่มด้านล่างเพื่อเพิ่มไข่ฟองใหม่ได้เลย</p>';
+    return;
+  }
+
+  owned.forEach((code) => {
+    const pet = PET_DATABASE[code];
+    let save = getSave(code) || createNewSave();
+    save = ensureVariant(code, save);
+    const stage = getStage(save.exp);
+    const visual = getPetVisual(code, save);
+
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "inv-item" + (code === currentCode ? " active-egg" : "");
+    item.innerHTML =
+      '<span class="inv-emoji">' + petStageVisualHTML(visual.stages[stage]) + '</span>' +
+      '<span class="inv-info">' +
+        '<span class="inv-name">' + pet.name + '</span><br>' +
+        '<span class="inv-stage">' + stageLabel(stage) + (visual.variantLabel ? " · ✨" : "") + (code === currentCode ? " · กำลังเลี้ยงอยู่" : "") + '</span>' +
+      '</span>';
+    item.addEventListener("click", () => switchToCode(code));
+    list.appendChild(item);
+  });
+}
+
+function switchToCode(code){
+  let save = getSave(code) || createNewSave();
+  save = applyDecay(save);
+  save = ensureVariant(code, save);
+  writeSave(code, save);
+  currentCode = code;
+  currentSave = save;
+  localStorage.setItem(STORAGE_ACTIVE_KEY, code);
+  closeInventory();
+  showPetScreen();
+}
+
+function resetPet(){
+  if (!confirm("ต้องการล้างข้อมูลการเลี้ยงของไข่นี้ทั้งหมดใช่ไหม? การกระทำนี้ย้อนกลับไม่ได้")) return;
+  const keepVariant = currentSave.variantKey; // รีเซ็ตแค่ค่าเลี้ยง ไม่สุ่มสีพิเศษใหม่ ของเดิมที่เคยได้ยังคงอยู่
+  currentSave = createNewSave();
+  currentSave.variantKey = keepVariant;
+  persist();
+  renderPetScreen();
+}
+
+/* ---- Init ---- */
+function init(){
+  migrateOwnedCodes();
+
+  $("redeemBtn").addEventListener("click", tryRedeem);
+  $("codeInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryRedeem(); });
+  $("backToPetBtn").addEventListener("click", () => { if (currentCode) showPetScreen(); });
+  $("feedBtn").addEventListener("click", doFeed);
+  $("petBtn").addEventListener("click", doPet);
+  $("resetBtn").addEventListener("click", resetPet);
+  $("downloadBtn").addEventListener("click", () => {
+    if (!currentCode || !currentSave) return;
+    const visual = getPetVisual(currentCode, currentSave);
+    if (visual.downloadUrl) window.open(visual.downloadUrl, "_blank");
+  });
+
+  $("inventoryBtn").addEventListener("click", openInventory);
+  $("closeInventoryBtn").addEventListener("click", closeInventory);
+  $("addEggBtn").addEventListener("click", () => { closeInventory(); showRedeemScreen(); });
+  $("inventoryModal").addEventListener("click", (e) => {
+    if (e.target.id === "inventoryModal") closeInventory();
+  });
+
+  const activeCode = localStorage.getItem(STORAGE_ACTIVE_KEY);
+  if (activeCode && PET_DATABASE[activeCode]){
+    let save = getSave(activeCode) || createNewSave();
+    save = applyDecay(save);
+    save = ensureVariant(activeCode, save);
+    writeSave(activeCode, save);
+    currentCode = activeCode;
+    currentSave = save;
+    showPetScreen();
+  } else {
+    showRedeemScreen();
+  }
+
+  setInterval(updateActionButtons, 1000);
+
+  // ทำให้ความหิว/ความสุขไหลลงแบบ real-time ต่อหน้าผู้ใช้เลย ไม่ต้องรอรีเฟรชถึงจะเห็นค่าลด
+  setInterval(() => {
+    if (!currentCode || !currentSave) return;
+    applyDecay(currentSave);
+    persist();
+    renderPetScreen();
+  }, LIVE_DECAY_TICK_MS);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+
+</body>
+</html>
