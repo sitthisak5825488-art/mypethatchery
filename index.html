@@ -214,12 +214,12 @@
     width:220px;
     height:220px;
     margin:0 auto 18px;
-    background: transparent; /* เอาพื้นหลังสีม่วงขาวออก */
+    background: transparent;
     display:flex;
     align-items:center;
     justify-content:center;
     font-size:96px;
-    box-shadow: none; /* เอาเงาวงกลมออก */
+    box-shadow: none;
     user-select:none;
   }
   .pet-stage-img.bounce{ animation: bounce 0.5s ease; }
@@ -453,74 +453,10 @@
 </div>
 
 <script>
-/* =========================================================
-   PET_DATABASE — เพิ่มไข่ฟองใหม่ได้ที่นี่ ไม่ต้องแก้โค้ดส่วนอื่น
-   stages: [ไข่, ไข่ร้าว, ตัวเต็มวัย] — ใส่ได้ 2 แบบ ระบบตรวจจับให้อัตโนมัติ
-     1) อิโมจิ/ข้อความ เช่น "🥚" (ใช้ตอนยังไม่มีภาพจริง โชว์ได้ทันที)
-     2) พาธ/ลิงก์รูปภาพจริง เช่น "images/fire_stage1.png" หรือ URL เต็ม
-        (ถ้าใช้รูปจริง ให้ตั้งชื่อไฟล์ลงท้ายด้วย .png .jpg .jpeg .webp .gif หรือ .svg
-        ระบบจะรู้เองว่าต้องโชว์เป็น <img> ไม่ใช่ข้อความ)
-
-   ปรับความยาก/ความแรร์ของแต่ละไข่ได้เป็นรายตัว โดยใส่ฟิลด์เหล่านี้เพิ่ม
-   (ถ้าไม่ใส่ ระบบจะใช้ค่ากลาง DEFAULT_* ด้านล่างแทนอัตโนมัติ):
-     rarity            : ข้อความแสดงระดับความแรร์ เช่น "Legendary" (แค่โชว์ผล ไม่กระทบเกม)
-     feedHungerGain    : ให้อาหาร 1 ครั้ง ความหิวขึ้นกี่แต้ม (ยิ่งน้อย = อิ่มยาก)
-     feedExpGain       : ให้อาหาร 1 ครั้ง Exp ขึ้นกี่แต้ม
-     petHappyGain      : ลูบหัว 1 ครั้ง ความสุขขึ้นกี่แต้ม (ยิ่งน้อย = ปลื้มยาก)
-     petExpGain        : ลูบหัว 1 ครั้ง Exp ขึ้นกี่แต้ม
-     feedCooldownHours : ให้อาหารได้อีกครั้งต้องรอกี่ชั่วโมง
-     petCooldownHours  : ลูบหัวได้อีกครั้งต้องรอกี่ชั่วโมง
-
-   variants: ระบบสุ่มสีพิเศษตอนไถ่ไข่ (สุ่มแค่ครั้งเดียวตอนสร้างเซฟใหม่ แล้วล็อกผลถาวร
-   ไม่สุ่มซ้ำตอนรีเฟรชหรือรีเซ็ตค่าเลี้ยง) ใส่เป็น array ของ { key, weight, label, stages, downloadUrl }
-     key           : รหัสระบุตัวแปร ไม่ซ้ำกันในไข่ฟองเดียวกัน (จำเป็น)
-     weight        : น้ำหนักโอกาสสุ่ม เทียบเป็นสัดส่วนกับตัวอื่นในลิสต์ (จำเป็น) เช่น normal:98, shiny:2 = โอกาส shiny 2%
-     label         : ข้อความแท็กพิเศษที่จะโชว์บนหน้าเลี้ยง ถ้าไม่ใส่ (เช่นตัว normal) จะไม่มีแท็กขึ้น
-     stages   : ถ้าไม่ใส่ จะ fallback ไปใช้ stages ของไข่หลักแทน (ไม่ต้องพิมพ์ซ้ำสำหรับตัว normal)
-     downloadUrl   : ถ้าไม่ใส่ จะ fallback ไปใช้ downloadUrl ของไข่หลักแทน
-   ถ้าไม่ใส่ฟิลด์ variants เลย = ไข่ฟองนั้นไม่มีระบบสุ่มสี ใช้ stages/downloadUrl ปกติเสมอ
-========================================================= */
 const PET_DATABASE = {
-  "EGG-FIRE-9X2A": {
-    name: "ไข่มังกรเพลิง (Fire Dragon)",
-    stages: ["egg1.png", "🥚", "pet_adult.png"],
-    downloadUrl: "https://drive.google.com/uc?id=YOUR_FILE_ID_1",
-    rarity: "ปกติ",
-    // ตัวอย่าง: โอกาส 2% ได้สีพิเศษ (Shiny) ที่มีภาพ/ลิงก์ HD แยกต่างหาก
-    variants: [
-      { key: "normal", weight: 98 },
-      {
-        key: "shiny",
-        weight: 2,
-        label: "✨ สีพิเศษ (Shiny) — เจอโอกาสแค่ 2%!",
-        stages: ["🥚", "💠🥚", "🐲"],
-        downloadUrl: "https://drive.google.com/uc?id=YOUR_SHINY_FILE_ID"
-      }
-    ]
-    // ไม่ใส่ฟิลด์ gain/cooldown ไว้ = ใช้ค่ากลางทั้งหมด
-  },
-  "EGG-WTR-87BP": {
-    name: "ไข่พญานาคาสมุทร (Ocean Serpent)",
-    stages: ["🥚", "💧🥚", "🐍"],
-    downloadUrl: "https://drive.google.com/uc?id=YOUR_FILE_ID_2",
-    rarity: "ปกติ"
-  },
-  "EGG-GOLD-RARE1": {
-    name: "ไข่เทพมังกรทองคำ (Golden Sovereign — หายากมาก)",
-    stages: ["🥚", "✨🥚", "🐲"],
-    downloadUrl: "https://drive.google.com/uc?id=YOUR_FILE_ID_3",
-    rarity: "Legendary",
-    // ตัวอย่าง: ไข่แรร์ เลี้ยงยากกว่าไข่ปกติชัดเจน — อิ่ม/ปลื้มขึ้นน้อยกว่า และต้องรอนานกว่าจะทำซ้ำได้
-    feedHungerGain: 12,
-    feedExpGain: 4,
-    petHappyGain: 10,
-    petExpGain: 3,
-    feedCooldownHours: 8,
-    petCooldownHours: 8
-  },
-  const PET_DATABASE = {
   // -------------------------------------------------------------
   // 01 : Burned Toast Dragon (มังกรปิ้งไหม้)
+  // Code: EGG-AAX7-DRXGON
   // -------------------------------------------------------------
   "EGG-AAX7-DRXGON": {
     name: "Burned Toast Dragon (มังกรปิ้งไหม้)",
@@ -531,17 +467,17 @@ const PET_DATABASE = {
       "013.png"  // รูปร่างโตเต็มวัย
     ],
     downloadUrl: "https://drive.google.com/drive/folders/11u-TtCcqM6TRu-1CtSPFhOz9fUW4m9u6",
- // ⚙️ ตั้งเวลารายตัว & แต้มกิจกรรม (ถ้าไม่ใส่จะใช้ค่ากลาง 4 ชม. อัตโนมัติ)
-    feedCooldownHours: 2,    // คูลดาวน์ให้อาหาร: รอนาน 2 ชั่วโมง
-    petCooldownHours: 2,     // คูลดาวน์ลูบหัว: รอนาน 2 ชั่วโมง
+    feedCooldownHours: 2,    // คูลดาวน์ให้อาหาร: 2 ชั่วโมง
+    petCooldownHours: 2,     // คูลดาวน์ลูบหัว: 2 ชั่วโมง
     feedHungerGain: 30,      // ให้อาหาร 1 ครั้ง: ความหิว +30
     feedExpGain: 15,         // ให้อาหาร 1 ครั้ง: Exp +15
     petHappyGain: 20,        // ลูบหัว 1 ครั้ง: ความสุข +20
-    petExpGain: 10,          // ลูบหัว 1 ครั้ง: Exp +10
+    petExpGain: 10           // ลูบหัว 1 ครั้ง: Exp +10
   },
 
   // -------------------------------------------------------------
   // 02 : Sleepy Mushroom Fox (จิ้งจอกเห็ด)
+  // Code: EGG-MBXRT-FOX
   // -------------------------------------------------------------
   "EGG-MBXRT-FOX": {
     name: "Sleepy Mushroom Fox (จิ้งจอกเห็ด)",
@@ -552,16 +488,17 @@ const PET_DATABASE = {
       "023.png"  // รูปร่างโต
     ],
     downloadUrl: "https://drive.google.com/drive/folders/11uYEeWK98B2KufBQdduiCF4EaQxHfOuK",
-   // ⚙️ ตั้งเวลารายตัว (สไตล์จิ้งจอกนอนหลับนาน)
     feedCooldownHours: 6,    // รอนาน 6 ชั่วโมง
     petCooldownHours: 4,     // รอนาน 4 ชั่วโมง
     feedHungerGain: 45,      // ให้อาหารทีอิ่มยาว +45
     feedExpGain: 25,         // Exp +25
     petHappyGain: 35,        // ลูบหัวทีฟินมาก +35
-    petExpGain: 15,          // Exp +15
+    petExpGain: 15           // Exp +15
   },
+
   // -------------------------------------------------------------
   // 03 : Soda Jelly Slime (สไลม์เจลลี่โซดา)
+  // Code: EGG-SXDE-SLIME
   // -------------------------------------------------------------
   "EGG-SXDE-SLIME": {
     name: "Soda Jelly Slime (สไลม์เจลลี่โซดา)",
@@ -571,12 +508,8 @@ const PET_DATABASE = {
       "032.png", // รูปร่างเด็ก
       "033.png"  // รูปร่างโต
     ],
-    downloadUrl: "https://drive.google.com/drive/folders/12-27_O3ge8nu9ShOsG8KlDLhPdeSwpZR",
-  
-      }
-    ]
+    downloadUrl: "https://drive.google.com/drive/folders/12-27_O3ge8nu9ShOsG8KlDLhPdeSwpZR"
   }
-};
 };
 
 /* ---- ค่ากลาง ใช้กับไข่ที่ไม่ได้ระบุ override รายตัว ---- */
@@ -649,7 +582,7 @@ function rollVariant(variants){
   return variants[variants.length - 1];
 }
 
-/* สุ่ม variant ให้เซฟที่ยังไม่เคยสุ่ม (ไข่ใหม่ หรือเซฟเก่าก่อนเพิ่มฟีเจอร์นี้) แล้วล็อกผลถาวรลงในเซฟ */
+/* สุ่ม variant ให้เซฟที่ยังไม่เคยสุ่ม แล้วล็อกผลถาวรลงในเซฟ */
 function ensureVariant(code, save){
   const pet = PET_DATABASE[code];
   if (pet && Array.isArray(pet.variants) && pet.variants.length > 0 && !save.variantKey){
@@ -708,7 +641,6 @@ function addOwnedCode(code){
   }
 }
 
-/* สำหรับผู้ที่เคยเลี้ยงไข่มาก่อนจะมีระบบคลัง: กวาดหาเซฟเก่าในเบราว์เซอร์มาขึ้นคลังให้อัตโนมัติ */
 function migrateOwnedCodes(){
   const owned = new Set(getOwnedCodes());
   Object.keys(localStorage).forEach((key) => {
@@ -729,7 +661,6 @@ function stageLabel(stage){
   return stage === 0 ? "Stage 0 · ไข่" : stage === 1 ? "Stage 1 · ไข่ร้าว" : "Stage 2 · โตเต็มวัย";
 }
 
-/* Apply real-time decay based on elapsed time since lastUpdate */
 function applyDecay(save){
   const now = Date.now();
   const hoursElapsed = (now - save.lastUpdate) / (1000 * 60 * 60);
@@ -879,7 +810,7 @@ function doPet(){
 function playAnim(cls){
   const img = $("petImg");
   img.classList.remove("bounce","shake-crack");
-  void img.offsetWidth; // reflow to restart animation
+  void img.offsetWidth;
   img.classList.add(cls);
 }
 
@@ -982,7 +913,7 @@ function switchToCode(code){
 
 function resetPet(){
   if (!confirm("ต้องการล้างข้อมูลการเลี้ยงของไข่นี้ทั้งหมดใช่ไหม? การกระทำนี้ย้อนกลับไม่ได้")) return;
-  const keepVariant = currentSave.variantKey; // รีเซ็ตแค่ค่าเลี้ยง ไม่สุ่มสีพิเศษใหม่ ของเดิมที่เคยได้ยังคงอยู่
+  const keepVariant = currentSave.variantKey;
   currentSave = createNewSave();
   currentSave.variantKey = keepVariant;
   persist();
@@ -1027,7 +958,6 @@ function init(){
 
   setInterval(updateActionButtons, 1000);
 
-  // ทำให้ความหิว/ความสุขไหลลงแบบ real-time ต่อหน้าผู้ใช้เลย ไม่ต้องรอรีเฟรชถึงจะเห็นค่าลด
   setInterval(() => {
     if (!currentCode || !currentSave) return;
     applyDecay(currentSave);
